@@ -13,16 +13,24 @@ from ..losses import HierarchyLoss, ConceptClassificationLoss, OverlapLoss
 class HyperbolicDiskClassification(pl.LightningModule):
 
     def __init__(self, concept_hierarchy: Tensor, concept_dim_size: int=5, inner_size=10, outer_size=50, margin=0.5, 
-            negative_sample_ratio=10.0):
+            negative_sample_ratio=10.0, loss_ratios=None):
         ''' concept_hierarchy: NxN bool tensor where i,j = True means i < j '''
         super().__init__()
+
+        self.n_concepts = len(concept_hierarchy)
+        self.concept_dim_size = concept_dim_size
+
+        if loss_ratios is None:
+            loss_ratios = {"concept_loss": 0.7125,
+                           "hierarchy_loss": 0.2375,
+                           "overlap_loss": 0.05}
+        self.loss_ratios = loss_ratios
+
+        self.manifold = geoopt.PoincareBall(1.0, learnable=False)
+
         self.feature_extractor = models.efficientnet_b0(pretrained=True)
         self.input_size = self.feature_extractor.classifier[1].in_features
         self.feature_extractor.classifier = nn.Identity()
-
-        self.n_concepts = len(concept_hierarchy) 
-        self.concept_dim_size = concept_dim_size
-        self.manifold = geoopt.PoincareBall(1.0, learnable=False)
 
         self.radius_ = nn.Parameter(
             torch.log(0.1*torch.ones((n_concepts,)))
@@ -70,12 +78,16 @@ class HyperbolicDiskClassification(pl.LightningModule):
         x = self.head(x).double()
         return self.projection(x)
 
+    def losses(self, embedding, target):
+        loss  = self.loss_ratios['hierarchy_loss'] * self.hierarchy_loss() 
+        loss += self.loss_ratios['overlap_loss']   * self.overlap_loss()
+        loss += self.loss_ratios['concept_loss']   * self.concept_loss(embedding, target)
+        return loss
 
     def training_step(self, batch, batch_idx):
-        # training_step defined the train loop.
-        # It is independent of forward
         image, target = batch
         embedding = self.forward(image)
+        loss = losses(embedding, target)
         return loss
       
     def configure_optimizers(self):
