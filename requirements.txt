@@ -1,0 +1,8 @@
+torch
+torchvision
+torchtext
+transformers
+datasets 
+pytorch-lightning
+git+https://github.com/geoopt/geoopt.git
+h5py
