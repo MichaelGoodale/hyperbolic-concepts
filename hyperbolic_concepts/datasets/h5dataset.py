@@ -48,20 +48,20 @@ def create_dataset(data_path: str, h5file_path: str) -> List[str]:
     N_IMAGES = (len(animal_data))
     batch_size = 512
 
-    loader = torch.utils.data.DataLoader(animal_data,
-                                              batch_size=batch_size,
-                                              num_workers=2)
-    train_length = int(len(loader)*0.7)
-    test_length = int(len(loader)*0.2)
-    val_length = len(loader) - test_length - train_length
-    splits = torch.utils.data.random_split(loader, [train_length, test_length, val_length])
+    train_length = int(len(animal_data)*0.7)
+    test_length = int(len(animal_data)*0.2)
+    val_length = len(animal_data) - test_length - train_length
+    splits = torch.utils.data.random_split(animal_data, [train_length, test_length, val_length])
     names = [h5file_path+name+'.hdf5' for name in ['train', 'test', 'val']]
 
     for name, split in zip(names, splits):
+        loader = torch.utils.data.DataLoader(split,
+                                                  batch_size=batch_size,
+                                                  num_workers=2)
         with h5py.File(name, 'w') as  h5f:
           img_ds = h5f.create_dataset('images', shape=(N_IMAGES, channel, width, height), dtype='uint8', chunks=(32, 3, 224, 224))
           target_ds = h5f.create_dataset('targets', shape=(N_IMAGES), dtype=int, chunks=True)
-          for i, (image, target) in enumerate(tqdm(split)):
+          for i, (image, target) in enumerate(tqdm(loader)):
             img_ds[i*batch_size:(i+1)*batch_size, :, :, :] = image
             target_ds[i*batch_size:(i+1)*batch_size] = target
     return names 
