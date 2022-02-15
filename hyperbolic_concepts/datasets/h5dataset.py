@@ -8,6 +8,8 @@ import torch.nn.functional as F
 from tqdm import tqdm
 import h5py
 
+from typing import List
+
 class H5Dataset(torch.utils.data.Dataset):
 
   def __init__(self, file_path, target_transform=lambda x: x, transform=lambda x:x):
@@ -18,7 +20,6 @@ class H5Dataset(torch.utils.data.Dataset):
       self.target_transform = target_transform
       self.transform = transform
       
-
   def __getitem__(self, index):
     if not hasattr(self, 'h5_file'):
       self.h5_file = h5py.File(self.file_path , 'r')
@@ -35,7 +36,7 @@ class H5Dataset(torch.utils.data.Dataset):
       return self.length
 
 
-def create_dataset(data_path: str, h5file_path: str):
+def create_dataset(data_path: str, h5file_path: str) -> List[str]:
     preprocess = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -47,15 +48,20 @@ def create_dataset(data_path: str, h5file_path: str):
     N_IMAGES = (len(animal_data))
     batch_size = 512
 
-    #TODO: Split into val, train and test.
-
     loader = torch.utils.data.DataLoader(animal_data,
                                               batch_size=batch_size,
                                               num_workers=2)
+    train_length = int(len(loader)*0.7)
+    test_length = int(len(loader)*0.2)
+    val_length = len(loader) - test_length - train_length
+    splits = torch.utils.data.random_split(loader, [train_length, test_length, val_length])
+    names = [h5file_path+name+'.hdf5' for name in ['train', 'test', 'val']]
 
-    with h5py.File(h5file_path, 'w') as  h5f:
-      img_ds = h5f.create_dataset('images', shape=(N_IMAGES, channel, width, height), dtype='uint8', chunks=(32, 3, 224, 224))
-      target_ds = h5f.create_dataset('targets', shape=(N_IMAGES), dtype=int, chunks=True)
-      for i, (image, target) in enumerate(tqdm(loader)):
-        img_ds[i*batch_size:(i+1)*batch_size, :, :, :] = image
-        target_ds[i*batch_size:(i+1)*batch_size] = target
+    for name, split in zip(names, splits):
+        with h5py.File(name, 'w') as  h5f:
+          img_ds = h5f.create_dataset('images', shape=(N_IMAGES, channel, width, height), dtype='uint8', chunks=(32, 3, 224, 224))
+          target_ds = h5f.create_dataset('targets', shape=(N_IMAGES), dtype=int, chunks=True)
+          for i, (image, target) in enumerate(tqdm(split)):
+            img_ds[i*batch_size:(i+1)*batch_size, :, :, :] = image
+            target_ds[i*batch_size:(i+1)*batch_size] = target
+    return names 
