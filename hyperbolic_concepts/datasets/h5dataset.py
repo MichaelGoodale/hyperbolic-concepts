@@ -45,7 +45,6 @@ def create_dataset(data_path: str, h5file_path: str) -> List[str]:
 
     animal_data = datasets.ImageFolder(data_path, transform=preprocess)
     channel, width, height = [3, 224, 224]
-    N_IMAGES = (len(animal_data))
     batch_size = 512
 
     train_length = int(len(animal_data)*0.7)
@@ -59,8 +58,8 @@ def create_dataset(data_path: str, h5file_path: str) -> List[str]:
                                                   batch_size=batch_size,
                                                   num_workers=2)
         with h5py.File(name, 'w') as  h5f:
-          img_ds = h5f.create_dataset('images', shape=(N_IMAGES, channel, width, height), dtype='uint8', chunks=(32, 3, 224, 224))
-          target_ds = h5f.create_dataset('targets', shape=(N_IMAGES), dtype=int, chunks=True)
+          img_ds = h5f.create_dataset('images', shape=(len(split), channel, width, height), dtype='uint8', chunks=(32, 3, 224, 224))
+          target_ds = h5f.create_dataset('targets', shape=(len(split)), dtype=int, chunks=True)
           for i, (image, target) in enumerate(tqdm(loader)):
             img_ds[i*batch_size:(i+1)*batch_size, :, :, :] = image
             target_ds[i*batch_size:(i+1)*batch_size] = target
