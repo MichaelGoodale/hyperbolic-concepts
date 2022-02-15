@@ -1,8 +1,12 @@
 import torch 
+import os
+
+PREDICATE_PATH = (os.path.join(os.path.dirname(__file__), "../predicates.txt"))
+CLASS_PATH = (os.path.join(os.path.dirname(__file__), "../classes.txt"))
 
 feature2idx = {}
 features = []
-with open("../predicates.txt") as f:
+with open(PREDICATE_PATH) as f:
   for l in f:
     idx, feature = l.strip().split('\t')
     idx = int(idx) - 1
@@ -11,7 +15,7 @@ with open("../predicates.txt") as f:
 classes2idx = {}
 dumb_class_map = {}
 classes = []
-with open("../classes.txt") as f:
+with open(CLASS_PATH) as f:
   for l in f:
     idx, class_name = l.strip().split('\t')
     dumb_class_map[class_name] = int(idx) - 1
@@ -71,5 +75,3 @@ for k in classes2membership:
   for superset in supersets:
     super_idx = super_animals_2_idx[superset]
     super_animal_mat[classes2idx[k], super_idx] = 1
-
-print(super_animal_mat)
