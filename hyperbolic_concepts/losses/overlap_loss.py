@@ -16,8 +16,8 @@ class OverlapLoss(nn.Module):
         self.invalids = invalids
 
     def forward(self, n_samples=256) -> Tensor:
-        radii = model.radii.expand(model.concepts.shape[0], -1)
-        overlap_length = (self.margin + radii + radii.T - model.distance(model.concepts, model.concepts))
+        radii = model.radius.expand(model.concept.shape[0], -1)
+        overlap_length = (self.margin + radii + radii.T - model.distance(model.concept, model.concept))
         overlap_length, _ = torch.topk(F.relu(overlap_length[self.invalids]), n_samples)
         return overlap_length.mean() 
 

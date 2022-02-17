@@ -20,8 +20,8 @@ class HierarchyLoss(nn.Module):
 
 
     def forward(self, model) -> Tensor:
-        radii = model.radii.expand(model.concepts.shape[0], -1) 
-        distances =  model.distance(model.concepts, model.concepts) - radii.T + radii
+        radii = model.radius.expand(model.concept.shape[0], -1) 
+        distances =  model.distance(model.concept, model.concept) - radii.T + radii
         pos_loss = torch.square(F.relu(distances[self.valids]))
 
         neg_loss = torch.square(F.relu(self.margin - distances[self.invalids]))
