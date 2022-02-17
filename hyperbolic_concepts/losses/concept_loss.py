@@ -7,7 +7,7 @@ from typing import Callable
 
 class ConceptClassificationLoss(nn.Module):
 
-    def __init__(self, self.model, margin=0.5, negative_sample_ratio:float = 10.0):
+    def __init__(self, model, margin=0.5, negative_sample_ratio:float = 10.0):
         ''' concepts: a NXD tensor where N is number of concepts and D is dimensionality of the space
             radii: a N tensor where each row is the radius of the corresponding conept in conepts'''
         super(ConceptClassificationLoss, self).__init__()
