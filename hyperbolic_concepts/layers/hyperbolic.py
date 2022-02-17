@@ -1,5 +1,8 @@
 import torch.nn
 import geoopt
+from geoopt.manifolds.lorentz import Lorentz
+from geoopt import ManifoldParameter, Manifold
+
 '''From https://github.com/geoopt/geoopt'''
 
 # package.nn.modules.py
