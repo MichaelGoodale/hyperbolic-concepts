@@ -33,7 +33,7 @@ class HyperbolicDiskClassification(pl.LightningModule):
         self.feature_extractor.classifier = nn.Identity()
 
         self.radius_ = nn.Parameter(
-            torch.log(0.1*torch.ones((n_concepts,)))
+            torch.log(0.1*torch.ones((self.n_concepts,)))
         )
 
         self.concepts_ = geoopt.ManifoldParameter(
