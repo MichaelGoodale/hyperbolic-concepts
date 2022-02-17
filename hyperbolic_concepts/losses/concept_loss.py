@@ -22,10 +22,10 @@ class ConceptClassificationLoss(nn.Module):
             targets: a NXC boolean tensor where N is batch_size and C is the number of concepts'''
         distance = self.distance(embeddings, self.concepts)
         radii = self.radii.expand(len(embeddings), -1)
-        pos_radius_loss = torch.square(F.relu(self.margin + distance[target]  - radii[target]))
-        neg_radius_loss = torch.square(F.relu(self.margin - distance[~target] + radii[~target]))
+        pos_radius_loss = torch.square(F.relu(self.margin + distance[targets]  - radii[targets]))
+        neg_radius_loss = torch.square(F.relu(self.margin - distance[~targets] + radii[~targets]))
 
-        n_neg_samples = min(self.negative_sample_ratio*len(pos_radius_loss), (~target).sum())
+        n_neg_samples = min(self.negative_sample_ratio*len(pos_radius_loss), (~targets).sum())
         neg_radius_loss, _ = torch.topk(neg_radius_loss, k=n_neg_samples)
 
         perm = torch.randperm(len(neg_radius_loss))[:len(pos_radius_loss)]
