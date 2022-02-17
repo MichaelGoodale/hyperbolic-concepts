@@ -88,13 +88,13 @@ class HyperbolicDiskClassification(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         image, target = batch
         embedding = self.forward(image)
-        loss = losses(embedding, target)
+        loss = self.losses(embedding, target)
         return loss
 
     def validation_step(self, batch, batch_idx):
         image, target = batch
         embedding = self.forward(image)
-        loss = losses(embedding, target)
+        loss = self.losses(embedding, target)
         return loss
       
     def configure_optimizers(self):
