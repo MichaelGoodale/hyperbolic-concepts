@@ -26,7 +26,7 @@ class H5Dataset(torch.utils.data.Dataset):
       self.images = self.h5_file['images']
       self.targets = self.h5_file['targets']
     return (self.transform(torch.from_numpy(self.images[index])),
-            self.target_transform(self.targets[index]))
+            self.target_transform(torch.from_numpy(self.targets[index])))
     
   def __del__(self):
       if hasattr(self, 'h5_file'):
