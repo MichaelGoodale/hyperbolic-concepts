@@ -1,7 +1,9 @@
 import torch.nn
 import geoopt
+
 from geoopt.manifolds.lorentz import Lorentz
 from geoopt import ManifoldParameter, Manifold
+from torch import Tensor
 
 '''From https://github.com/geoopt/geoopt'''
 
