@@ -20,8 +20,8 @@ class ConceptClassificationLoss(nn.Module):
     def forward(self, embeddings: Tensor, targets: Tensor) -> Tensor:
         ''' embeddings: a NXD tensor where N is batch_size and D is dimensionality of the space
             targets: a NXC boolean tensor where N is batch_size and C is the number of concepts'''
-        distance = self.distance(embedding, self.concepts)
-        radii = self.radii.expand(len(embedding), -1)
+        distance = self.distance(embeddings, self.concepts)
+        radii = self.radii.expand(len(embeddings), -1)
         pos_radius_loss = torch.square(F.relu(self.margin + distance[target]  - radii[target]))
         neg_radius_loss = torch.square(F.relu(self.margin - distance[~target] + radii[~target]))
 
