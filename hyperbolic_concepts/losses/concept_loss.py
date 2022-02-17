@@ -7,21 +7,19 @@ from typing import Callable
 
 class ConceptClassificationLoss(nn.Module):
 
-    def __init__(self, concepts: Tensor, radii: Tensor, distance: Callable, margin=0.5, negative_sample_ratio:float = 10.0):
+    def __init__(self, self.model, margin=0.5, negative_sample_ratio:float = 10.0):
         ''' concepts: a NXD tensor where N is number of concepts and D is dimensionality of the space
             radii: a N tensor where each row is the radius of the corresponding conept in conepts'''
         super(ConceptClassificationLoss, self).__init__()
-        self.concepts = concepts
-        self.radii = radii
-        self.distance = distance
+        self.model = model
         self.margin = margin
         self.negative_sample_ratio = negative_sample_ratio 
 
     def forward(self, embeddings: Tensor, targets: Tensor) -> Tensor:
         ''' embeddings: a NXD tensor where N is batch_size and D is dimensionality of the space
             targets: a NXC boolean tensor where N is batch_size and C is the number of concepts'''
-        distance = self.distance(embeddings, self.concepts)
-        radii = self.radii.expand(len(embeddings), -1)
+        distance = self.model.distance(embeddings, self.model.concepts)
+        radii = self.model.radii.expand(len(embeddings), -1)
         pos_radius_loss = torch.square(F.relu(self.margin + distance[targets]  - radii[targets]))
         neg_radius_loss = torch.square(F.relu(self.margin - distance[~targets] + radii[~targets]))
 
