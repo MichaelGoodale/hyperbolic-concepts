@@ -14,7 +14,7 @@ class ConceptClassificationLoss(nn.Module):
         self.margin = margin
         self.negative_sample_ratio = negative_sample_ratio 
 
-    def forward(self, embeddings: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, model, embeddings: Tensor, targets: Tensor) -> Tensor:
         ''' embeddings: a NXD tensor where N is batch_size and D is dimensionality of the space
             targets: a NXC boolean tensor where N is batch_size and C is the number of concepts'''
         distance = model.distance(embeddings, model.concept)
