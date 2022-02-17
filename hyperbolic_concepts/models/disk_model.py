@@ -54,7 +54,7 @@ class HyperbolicDiskClassification(pl.LightningModule):
 
         no_overlap = (~concept_hierarchy) & ((~concept_hierarchy).T) # Things that aren't dominated or don't dominated each other, shouldn't overlap.
 
-        self.overlap_loss = OverlapLoss(self.concepts, self.radius, self.distance, no_overlap)
+        self.overlap_loss = OverlapLoss(self.concept, self.radius, self.distance, no_overlap)
         self.hierarchy_loss = HierarchyLoss(self.concept, self.radius, self.distance, concept_hierarchy,
                 margin=margin)
         self.concept_loss = ConceptClassificationLoss(self.concept, self.radius, self.distance, \
