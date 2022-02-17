@@ -90,6 +90,12 @@ class HyperbolicDiskClassification(pl.LightningModule):
         embedding = self.forward(image)
         loss = losses(embedding, target)
         return loss
+
+    def validation_step(self, batch, batch_idx):
+        image, target = batch
+        embedding = self.forward(image)
+        loss = losses(embedding, target)
+        return loss
       
     def configure_optimizers(self):
       optimizer = RiemannianAdam(self.parameters(), lr=1e-3)
