@@ -9,6 +9,7 @@ from geoopt import ManifoldParameter, Manifold
 from geoopt.optim import RiemannianAdam, RiemannianSGD
 
 from ..losses import HierarchyLoss, ConceptClassificationLoss, OverlapLoss
+from ..layers import ProjectToManifold, MobiusLinear
 
 class HyperbolicDiskClassification(pl.LightningModule):
 
