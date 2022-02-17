@@ -54,10 +54,10 @@ class HyperbolicDiskClassification(pl.LightningModule):
 
         no_overlap = (~concept_hierarchy) & ((~concept_hierarchy).T) # Things that aren't dominated or don't dominated each other, shouldn't overlap.
 
-        self.overlap_loss = OverlapLoss(self, no_overlap)
-        self.hierarchy_loss = HierarchyLoss(self, concept_hierarchy,
+        self.overlap_loss = OverlapLoss(no_overlap)
+        self.hierarchy_loss = HierarchyLoss(concept_hierarchy,
                 margin=margin)
-        self.concept_loss = ConceptClassificationLoss(self, margin=margin,
+        self.concept_loss = ConceptClassificationLoss(margin=margin,
                 negative_sample_ratio=negative_sample_ratio)
 
     @property
@@ -80,9 +80,9 @@ class HyperbolicDiskClassification(pl.LightningModule):
         return self.projection(x)
 
     def losses(self, embedding, target):
-        loss  = self.loss_ratios['hierarchy_loss'] * self.hierarchy_loss() 
-        loss += self.loss_ratios['overlap_loss']   * self.overlap_loss()
-        loss += self.loss_ratios['concept_loss']   * self.concept_loss(embedding, target)
+        loss  = self.loss_ratios['hierarchy_loss'] * self.hierarchy_loss(self) 
+        loss += self.loss_ratios['overlap_loss']   * self.overlap_loss(self)
+        loss += self.loss_ratios['concept_loss']   * self.concept_loss(self, embedding, target)
         return loss
 
     def training_step(self, batch, batch_idx):
