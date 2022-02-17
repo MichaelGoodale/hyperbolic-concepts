@@ -10,7 +10,7 @@ class HierarchyLoss(nn.Module):
         ''' concepts: a NXD tensor where N is number of concepts and D is dimensionality of the space
             radii: a N tensor where each row is the radius of the corresponding conept in conepts
             valids: a NXN boolean tensor where invalids[i, j] is True if concept_i < concept_j '''
-        super(OverlapLoss, self).__init__()
+        super(HierarchyLoss, self).__init__()
         self.concepts = concepts
         self.radii = radii
         self.distance = distance
